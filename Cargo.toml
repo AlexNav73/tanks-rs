@@ -6,5 +6,8 @@ authors = ["AlexNav73 <fifthhorseman@mail.ru>"]
 [dependencies]
 gfx = "*"
 gfx_core = "*"
+gfx_device_gl = "*"
 gfx_window_glutin = "*"
 glutin = "*"
+genmesh = "*"
+cgmath = "*"
