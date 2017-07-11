@@ -5,60 +5,38 @@ extern crate gfx_core;
 extern crate gfx_window_glutin;
 extern crate gfx_device_gl;
 extern crate glutin;
+extern crate obj;
 
 extern crate genmesh;
 extern crate cgmath;
 
-use gfx::traits::FactoryExt;
 use glutin::{WindowEvent, VirtualKeyCode};
 
-use genmesh::generators::{Cube, IndexedPolygon, SharedVertex};
-use genmesh::{Triangulate, Vertices};
-
-use cgmath::{Matrix4, Deg, Point3, Vector3};
+use cgmath::{Matrix4, Point3, Vector3};
 
 mod defines;
 mod context;
+mod texture;
+mod mesh;
 
-use defines::{Vertex, Locals};
 use context::Context;
 
 pub fn main() {
-
     let mut context = Context::new();
 
-    let cube = Cube::new();
-    let vertex_data: Vec<Vertex> = cube.shared_vertex_iter()
-        .map(|v| Vertex::new([v.pos[0], v.pos[1], v.pos[2]], [0, 0]))
-        .collect();
-    let index_data: Vec<u32> = cube.indexed_polygon_iter()
-        .triangulate()
-        .vertices()
-        .map(|i| i as u32)
-        .collect();
+    let mut cube = mesh::cube::Cube::new(&mut context, [0.0, 0.0, 0.0]);
+    let mut cube2 = mesh::cube::Cube::new(&mut context, [3.0, 0.0, 0.0]);
+    //let mut object = mesh::object::Object::new(&mut context, "C:\\Users\\Aliaksandr\\Desktop\\Models\\sphere.obj");
 
-    let (vertex_buffer, slice) = context.factory.create_vertex_buffer_with_slice(&vertex_data, index_data.as_slice());
-
-    let mut running = true;
     let mut x: f32 = 0.0;
     let mut y: f32 = 3.0;
-    while running {
+    while context.is_running() {
         context.handle_event(|e| 
             match e {
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Escape), _) |
-                WindowEvent::Closed => running = false,
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => {
-                    x += 0.01;
-                },
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => {
-                    x -= 0.01;
-                },
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => {
-                    y += 0.01;
-                },
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => {
-                    y -= 0.01;
-                },
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => x += 0.01,
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => x -= 0.01,
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => y += 0.01,
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => y -= 0.01,
                 _ => {}
             }
         );
@@ -68,14 +46,16 @@ pub fn main() {
             Point3::new(0.0f32, 0.0, 0.0),
             Vector3::unit_z()
         );
-        
-        let proj = cgmath::perspective(Deg(45.0f32), 1.333, 1.0, 10.0);
-        let locals = Locals {
-            transform: (proj * matrix).into()
-        };
 
+        cube.transform(matrix);
+        cube2.transform(matrix);
+        
         context.clear();
-        context.render_mesh(&locals, &vertex_buffer, &slice);
+
+        context.render(cube.mesh());
+        context.render(cube2.mesh());
+        //context.render(object.mesh());
+
         context.flush();
     }
 }

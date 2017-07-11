@@ -19,7 +19,7 @@ gfx_defines! {
 
         transform: gfx::Global<[[f32; 4]; 4]> = "u_Transform",
         locals: gfx::ConstantBuffer<Locals> = "Locals",
-        color: gfx::TextureSampler<[f32; 4]> = "t_Color",
+        texture: gfx::TextureSampler<[f32; 4]> = "t_Color",
 
 
         out_color: gfx::RenderTarget<ColorFormat> = "Target0",
