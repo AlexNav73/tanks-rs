@@ -1,18 +1,15 @@
 
 use genmesh;
 
-use cgmath::{Matrix4, Point3, Vector3};
-
 use genmesh::generators::{IndexedPolygon, SharedVertex};
 use genmesh::{Triangulate, Vertices};
 
-use mesh::{Mesh, default_view};
-use defines::{Vertex, Locals};
+use mesh::{Object, Mesh, default_view};
+use defines::Vertex;
 use context::Context;
 
 pub struct Cube {
-    mesh: Mesh,
-    projection: Matrix4<f32>
+    mesh: Mesh
 }
 
 impl Cube {
@@ -29,16 +26,13 @@ impl Cube {
 
         let texels = [0x20, 0xA0, 0xC0, 0x00];
         Cube {
-            mesh: context.create_mesh(default_view(), &texels, &vertex_data, &index_data),
-            projection: context.projection
+            mesh: context.create_mesh(default_view(), &texels, &vertex_data, &index_data)
         }
     }
-
-    pub fn mesh(&self) -> &Mesh {
-        &self.mesh
-    }
-
-    pub fn transform(&mut self, new: Matrix4<f32>) {
-        self.mesh.locals = Locals { transform: (self.projection * new).into() };
-    }
 }
+
+impl Object for Cube {
+    fn mesh(&self) -> &Mesh { &self.mesh }
+    fn mesh_mut(&mut self) -> &mut Mesh { &mut self.mesh }
+}
+

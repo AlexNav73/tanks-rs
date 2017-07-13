@@ -14,7 +14,7 @@ use cgmath::{Matrix4, Deg, SquareMatrix};
 
 use defines::{pipe, ColorFormat, DepthFormat, Vertex};
 use texture::Texture;
-use mesh::Mesh;
+use mesh::{Object, Mesh};
 
 const CLEAR_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
@@ -90,7 +90,8 @@ impl Context {
         self.encoder.clear_depth(&self.data.out_depth, 1.0);
     }
 
-    pub fn render(&mut self, mesh: &Mesh) {
+    pub fn render<M: Object>(&mut self, model: &M) {
+        let mesh = model.mesh();
         self.data.vbuf = mesh.vertices().clone();
         self.data.texture.0 = mesh.texture().view();
         self.encoder.update_constant_buffer(&self.data.locals, mesh.locals());

@@ -11,7 +11,7 @@ use defines::{Vertex, Locals};
 use context::Context;
 
 pub mod cube;
-pub mod object;
+pub mod model;
 
 pub struct Mesh {
     vertices: Buffer<Resources, Vertex>,
@@ -49,6 +49,19 @@ impl Mesh {
 
     pub fn texture(&self) -> &Texture {
         &self.texture
+    }
+
+    pub fn update(&mut self, ctx: &Context, new: Matrix4<f32>) {
+        self.locals = Locals { transform: (ctx.projection * new).into() }
+    }
+}
+
+pub trait Object {
+    fn mesh(&self) -> &Mesh;
+    fn mesh_mut(&mut self) -> &mut Mesh;
+
+    fn transform(&mut self, ctx: &Context, new: Matrix4<f32>) {
+        self.mesh_mut().update(ctx, new);
     }
 }
 
