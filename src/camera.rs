@@ -18,7 +18,7 @@ impl Camera {
         let target = target.into();
 
         let dir = (target - position).normalize();
-        let q = Quaternion::look_at(dir, Vector3::unit_y()).invert();
+        let q = Quaternion::look_at(dir, Vector3::unit_y()).invert(); // Made Y axis as axis of the view (from screen to object)
         
         Camera {
            target,
@@ -37,9 +37,9 @@ impl Camera {
             .. Decomposed::one()
         };
 
-        let q_ver = Quaternion::from_angle_y(Rad(x - self.x)); // Rotate around Y axis (later it was Z axis)
+        let q_hor = Quaternion::from_angle_y(Rad(self.x - x)); // Rotate around Y axis (later it was Z axis)
         let axis = self.transform.rot * Vector3::unit_x(); // Rotate normalized X vec to new coordinate system with new rotation
-        let q_hor = Quaternion::from_axis_angle(axis, Rad(y - self.y)); // Rotate around rotated X axis 
+        let q_ver = Quaternion::from_axis_angle(axis, Rad(self.y - y)); // Rotate around rotated X axis 
 
         let post = Decomposed {
             scale: 1.0,

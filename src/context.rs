@@ -25,9 +25,9 @@ pub struct Context {
     pso: gfx::PipelineState<gfx_device_gl::Resources, pipe::Meta>,
     data: pipe::Data<gfx_device_gl::Resources>,
     encoder: gfx::Encoder<gfx_device_gl::Resources, gfx_device_gl::CommandBuffer>,
-    pub(crate) factory: gfx_device_gl::Factory,
+    pub factory: gfx_device_gl::Factory,
     running: bool,
-    pub(crate) projection: Matrix4<f32>,
+    pub projection: Matrix4<f32>,
 }
 
 impl Context {
@@ -42,8 +42,8 @@ impl Context {
         let texture = Texture::from_raw(&mut factory, &texels);
 
         let pso = factory.create_pipeline_simple(
-            include_bytes!("../assets/shaders/plane_150.glslv"),
-            include_bytes!("../assets/shaders/plane_150.glslf"),
+            include_bytes!("../assets/shaders/basic_150.glslv"),
+            include_bytes!("../assets/shaders/basic_150.glslf"),
             pipe::new()
         ).unwrap();
 
@@ -119,7 +119,7 @@ impl Context {
 
 fn build_window() -> glutin::WindowBuilder<'static> {
     glutin::WindowBuilder::new()
-        .with_title("Tiangle example".to_string())
+        .with_title("Tanks-rs".to_string())
         .with_dimensions(1024, 768)
         .with_vsync()
 }

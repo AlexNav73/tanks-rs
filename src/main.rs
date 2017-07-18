@@ -29,7 +29,7 @@ pub fn main() {
     //let mut object = mesh::model::Model::new(&mut context, "C:\\Users\\Aliaksandr\\Desktop\\Models\\sphere.obj");
     let mut cam = camera::Camera::new([4.0f32, 0.0, 0.0], [0.0, 0.0, 0.0]);
 
-    let mut x: f32 = 1.568;
+    let mut x: f32 = 0.0;
     let mut y: f32 = 0.0;
     while context.is_running() {
         context.handle_event(|e| 
@@ -41,13 +41,6 @@ pub fn main() {
                 _ => {}
             }
         );
-
-        //use cgmath::{Vector3, Matrix4, Point3};
-        // let matrix = Matrix4::look_at(
-        //     Point3::new(x, y, 3.0),
-        //     Point3::new(0.0f32, 0.0, 0.0),
-        //     Vector3::unit_z()
-        // );
 
         let matrix = cam.update(x, y);
 
