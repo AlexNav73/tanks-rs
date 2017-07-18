@@ -64,11 +64,3 @@ pub trait Object {
         self.mesh_mut().update(ctx, new);
     }
 }
-
-fn default_view() -> Matrix4<f32> {
-    Matrix4::look_at(
-        Point3::new(1.5f32, -5.0, 3.0),
-        Point3::new(0.0f32, 0.0, 0.0),
-        Vector3::unit_z()
-    )
-}

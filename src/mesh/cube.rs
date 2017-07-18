@@ -3,8 +3,9 @@ use genmesh;
 
 use genmesh::generators::{IndexedPolygon, SharedVertex};
 use genmesh::{Triangulate, Vertices};
+use cgmath::{Matrix4, SquareMatrix};
 
-use mesh::{Object, Mesh, default_view};
+use mesh::{Object, Mesh};
 use defines::Vertex;
 use context::Context;
 
@@ -26,7 +27,7 @@ impl Cube {
 
         let texels = [0x20, 0xA0, 0xC0, 0x00];
         Cube {
-            mesh: context.create_mesh(default_view(), &texels, &vertex_data, &index_data)
+            mesh: context.create_mesh(Matrix4::identity().into(), &texels, &vertex_data, &index_data)
         }
     }
 }

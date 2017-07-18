@@ -1,11 +1,13 @@
+#![allow(dead_code)]
 
 use std::path::Path;
 use std::fs::File;
 use std::io::BufReader;
 
 use obj::{self, load_obj};
+use cgmath::{Matrix4, SquareMatrix};
 
-use mesh::{Object, Mesh, default_view};
+use mesh::{Object, Mesh};
 use context::Context;
 use defines::Vertex;
 
@@ -24,7 +26,7 @@ impl Model {
 
         let texture = [0x20, 0xA0, 0xC0, 0x00];
         Model {
-            mesh: context.create_mesh(default_view(), &texture, &vert, idxs.as_slice())
+            mesh: context.create_mesh(Matrix4::identity().into(), &texture, &vert, idxs.as_slice())
         }
     }
 }
