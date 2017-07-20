@@ -37,14 +37,14 @@ impl Camera {
             .. Decomposed::one()
         };
 
-        let q_hor = Quaternion::from_angle_y(Rad(self.x - x)); // Rotate around Y axis (later it was Z axis)
+        let q_hor = Quaternion::from_angle_y(Rad(self.x - x)); // Rotate around Z axis
         let axis = self.transform.rot * Vector3::unit_x(); // Rotate normalized X vec to new coordinate system with new rotation
         let q_ver = Quaternion::from_axis_angle(axis, Rad(self.y - y)); // Rotate around rotated X axis 
 
         let post = Decomposed {
-            scale: 1.0,
+            rot: q_hor * q_ver,
             disp: self.target.to_vec(),
-            rot: q_hor * q_ver
+            scale: 1.0,
         };
 
         self.x = x;
@@ -52,5 +52,11 @@ impl Camera {
         self.transform = post.concat(&pre.concat(&self.transform));
 
         self.transform.into()
+    }
+
+    pub fn move_to(&mut self, x: f32, y: f32) {
+        self.target.x = x;
+        self.target.z = y;
+        self.transform.disp = self.target.to_vec();
     }
 }

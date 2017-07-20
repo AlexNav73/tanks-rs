@@ -51,7 +51,7 @@ impl Context {
             gfx::texture::FilterMethod::Bilinear,
             gfx::texture::WrapMode::Clamp);
 
-        let projection = cgmath::perspective(Deg(45.0f32), 1.333, 1.0, 10.0);
+        let projection = cgmath::perspective(Deg(45.0f32), 1.333, 1.0, 100.0);
 
         let data = pipe::Data {
             vbuf: factory.create_vertex_buffer(&[]),

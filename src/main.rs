@@ -31,6 +31,8 @@ pub fn main() {
 
     let mut x: f32 = 0.0;
     let mut y: f32 = 0.0;
+    let mut pos_x: f32 = 1.7;
+    let mut pos_y: f32 = -6.7;
     while context.is_running() {
         context.handle_event(|e| 
             match e {
@@ -38,10 +40,17 @@ pub fn main() {
                 WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => x -= 0.1,
                 WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => y += 0.1,
                 WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => y -= 0.1,
+
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Up), _) => pos_y += 0.1,
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Down), _) => pos_y -= 0.1,
+
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Left), _) => pos_x += 0.1,
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Right), _) => pos_x -= 0.1,
                 _ => {}
             }
         );
 
+        cam.move_to(pos_x, pos_y);
         let matrix = cam.update(x, y);
 
         cube.transform(&context, matrix);
