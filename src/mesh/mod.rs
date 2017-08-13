@@ -4,7 +4,7 @@ use gfx::traits::FactoryExt;
 use gfx_device_gl::Resources;
 use gfx_core::handle::Buffer;
 
-use cgmath::{Matrix4, Point3, Vector3};
+use cgmath::Matrix4;
 
 use texture::Texture;
 use defines::{Vertex, Locals};
@@ -23,6 +23,7 @@ pub struct Mesh {
 impl Mesh {
     pub fn new(context: &mut Context,
                matrix: Matrix4<f32>,
+               view: Matrix4<f32>,
                texture: &[u8],
                vertex_data: &[Vertex],
                index_data: &[u32]) -> Self {
@@ -30,7 +31,11 @@ impl Mesh {
         Mesh {
             vertices: vertex_buffer,
             slice,
-            locals: Locals { transform: (context.projection * matrix).into() },
+            locals: Locals {
+                transform: matrix.into(),
+                view: view.into(),
+                proj: context.projection.into()
+            },
             texture: context.create_texture(texture)
         }
     }
@@ -51,8 +56,12 @@ impl Mesh {
         &self.texture
     }
 
-    pub fn update(&mut self, ctx: &Context, new: Matrix4<f32>) {
-        self.locals = Locals { transform: (ctx.projection * new).into() }
+    pub fn update(&mut self, ctx: &Context, new: Matrix4<f32>, cam: Matrix4<f32>) {
+        self.locals = Locals {
+            transform: new.into(),
+            view: cam.into(),
+            proj: ctx.projection.into()
+        }
     }
 }
 
@@ -60,7 +69,7 @@ pub trait Object {
     fn mesh(&self) -> &Mesh;
     fn mesh_mut(&mut self) -> &mut Mesh;
 
-    fn transform(&mut self, ctx: &Context, new: Matrix4<f32>) {
-        self.mesh_mut().update(ctx, new);
+    fn transform(&mut self, ctx: &Context, new: Matrix4<f32>, cam: Matrix4<f32>) {
+        self.mesh_mut().update(ctx, new, cam);
     }
 }

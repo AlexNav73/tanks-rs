@@ -110,10 +110,15 @@ impl Context {
 
     pub fn create_mesh(&mut self,
                        position: Matrix4<f32>,
+                       cam: Matrix4<f32>,
                        texture: &[u8],
                        vertices: &[Vertex],
                        indexes: &[u32]) -> Mesh {
-        Mesh::new(self, position, texture, vertices, indexes)
+        Mesh::new(self, position, cam, texture, vertices, indexes)
+    }
+
+    pub fn get_viewport_size(&self) -> Option<(u32, u32)> {
+        self.window.get_inner_size_pixels()
     }
 }
 

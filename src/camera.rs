@@ -1,62 +1,72 @@
 
-use cgmath::{Point3, InnerSpace, Quaternion, Vector3, Decomposed, Rotation, EuclideanSpace, Matrix4, Transform as Transform_, Rotation3, Rad};
+use cgmath::{Point3, Vector3, Matrix4, EuclideanSpace, InnerSpace, Rad};
 
-type Transform = Decomposed<Vector3<f32>, Quaternion<f32>>;
+const CAMERA_SPEED: f32 = 1.0;
 
 pub struct Camera {
-   transform: Transform,
-   target: Point3<f32>,
-   x: f32,
-   y: f32
+    position: Vector3<f32>,
+    front: Vector3<f32>,
+    up: Vector3<f32>,
+    pitch: f32,
+    yaw: f32,
+    last: (f32, f32)
 }
 
 impl Camera {
     pub fn new<P>(position: P, target: P) -> Self 
         where P: Into<Point3<f32>>
     {
-        let position = position.into();
-        let target = target.into();
-
-        let dir = (target - position).normalize();
-        let q = Quaternion::look_at(dir, Vector3::unit_y()).invert(); // Made Y axis as axis of the view (from screen to object)
-        
         Camera {
-           target,
-           transform: Decomposed {
-               disp: position.to_vec(),
-               rot: q,
-               scale: 1.0
-           },
-           x: 0.0f32, y: 0.0f32
+            position: position.into().to_vec(),
+            front: target.into().to_vec(),
+            up: Vector3::unit_y(),
+            pitch: 0.0,
+            yaw: 0.0,
+            last: (0.0, 0.0)
         }
     }
 
-    pub fn update(&mut self, x: f32, y: f32) -> Matrix4<f32> {
-        let pre = Decomposed {
-            disp: -self.target.to_vec(),
-            .. Decomposed::one()
-        };
+    pub fn view(&self) -> Matrix4<f32> {
+        let pos = Point3::new(self.position.x, self.position.y, self.position.z);
+        let front = self.position + self.front;
+        let front = Point3::new(front.x, front.y, front.z);
 
-        let q_hor = Quaternion::from_angle_y(Rad(self.x - x)); // Rotate around Z axis
-        let axis = self.transform.rot * Vector3::unit_x(); // Rotate normalized X vec to new coordinate system with new rotation
-        let q_ver = Quaternion::from_axis_angle(axis, Rad(self.y - y)); // Rotate around rotated X axis 
-
-        let post = Decomposed {
-            rot: q_hor * q_ver,
-            disp: self.target.to_vec(),
-            scale: 1.0,
-        };
-
-        self.x = x;
-        self.y = y;
-        self.transform = post.concat(&pre.concat(&self.transform));
-
-        self.transform.into()
+        Matrix4::look_at(pos, front, self.up)
     }
 
-    pub fn move_to(&mut self, x: f32, y: f32) {
-        self.target.x = x;
-        self.target.z = y;
-        self.transform.disp = self.target.to_vec();
+    pub fn rotate(&mut self, x: f32, y: f32) {
+        use cgmath::{Zero, Angle};
+
+        let pitch = x - self.last.0;
+        let yaw = self.last.1 - y;
+
+        self.last.0 = x;
+        self.last.1 = y;
+
+        self.pitch += pitch;
+        self.yaw += yaw;
+
+        let mut direction = Vector3::zero();
+        direction.x = Rad(self.pitch).cos() * Rad(self.yaw).cos();
+        direction.y = Rad(self.pitch).sin();
+        direction.z = Rad(self.pitch).cos() * Rad(self.yaw).sin();
+
+        self.front = direction.normalize();
+    }
+
+    pub fn move_forward(&mut self) {
+        self.position += self.front * CAMERA_SPEED;
+    }
+
+    pub fn move_back(&mut self) {
+        self.position -= self.front * CAMERA_SPEED;
+    }
+
+    pub fn move_left(&mut self) {
+        self.position -= self.front.cross(self.up).normalize() * CAMERA_SPEED;
+    }
+
+    pub fn move_right(&mut self) {
+        self.position += self.front.cross(self.up).normalize() * CAMERA_SPEED;
     }
 }

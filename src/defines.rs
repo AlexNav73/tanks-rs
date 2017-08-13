@@ -6,12 +6,14 @@ pub type DepthFormat = gfx::format::DepthStencil;
 
 gfx_defines! {
     vertex Vertex {
-        pos: [f32; 4] = "a_Pos",
+        pos: [f32; 3] = "a_Pos",
         tex_coord: [f32; 2] = "a_TexCoord",
     }
 
     constant Locals {
         transform: [[f32; 4]; 4] = "u_Transform",
+        view: [[f32; 4]; 4] = "u_View",
+        proj: [[f32; 4]; 4] = "u_Proj",
     }
 
     pipeline pipe {
@@ -30,7 +32,7 @@ gfx_defines! {
 impl Vertex {
     pub fn new(p: [f32; 3], t: [i8; 2]) -> Vertex {
         Vertex {
-            pos: [p[0], p[1], p[2], 1.0],
+            pos: [p[0], p[1], p[2]],
             tex_coord: [t[0] as f32, t[1] as f32],
         }
     }

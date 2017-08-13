@@ -23,45 +23,44 @@ use mesh::Object;
 
 pub fn main() {
     let mut context = Context::new();
+    let mut cam = camera::Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0]); 
 
-    let mut cube = mesh::cube::Cube::new(&mut context, [0.0, 0.0, 0.0]);
-    let mut cube2 = mesh::cube::Cube::new(&mut context, [3.0, 0.0, 0.0]);
-    //let mut object = mesh::model::Model::new(&mut context, "C:\\Users\\Aliaksandr\\Desktop\\Models\\sphere.obj");
-    let mut cam = camera::Camera::new([4.0f32, 0.0, 0.0], [0.0, 0.0, 0.0]);
+    let mut cube = mesh::cube::Cube::new(&mut context, &cam, [0.0, 0.0, 0.0]);
+    let mut cube2 = mesh::cube::Cube::new(&mut context, &cam, [3.0, 0.0, 0.0]);
+    let mut object = mesh::model::Model::new(&mut context, &cam, "C:\\Users\\Aliaksandr\\Desktop\\Models\\sphere.obj");
 
-    let mut x: f32 = 0.0;
-    let mut y: f32 = 0.0;
-    let mut pos_x: f32 = 1.7;
-    let mut pos_y: f32 = -6.7;
+    let window_size = context.get_viewport_size().unwrap();
     while context.is_running() {
         context.handle_event(|e| 
             match e {
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => x += 0.1,
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => x -= 0.1,
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => y += 0.1,
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => y -= 0.1,
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => cam.move_forward(),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => cam.move_back(),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => cam.move_left(),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => cam.move_right(),
 
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Up), _) => pos_y += 0.1,
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Down), _) => pos_y -= 0.1,
-
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Left), _) => pos_x += 0.1,
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Right), _) => pos_x -= 0.1,
+                WindowEvent::MouseMoved(mouse_y, mouse_x) => {
+                    let x = (mouse_x as f32 - (window_size.0 as f32 / 2.0)) / 100.0;
+                    let y = (mouse_y as f32 - (window_size.1 as f32 / 2.0)) / 100.0;
+                    cam.rotate(x, y);
+                },
                 _ => {}
             }
         );
 
-        cam.move_to(pos_x, pos_y);
-        let matrix = cam.update(x, y);
+        let view = cam.view();
 
-        cube.transform(&context, matrix);
-        cube2.transform(&context, matrix);
-        //object.transform(&context, matrix);
+        use cgmath::{Matrix4, SquareMatrix};
+        let matrix = Matrix4::identity();
+
+        cube.transform(&context, matrix, view);
+        cube2.transform(&context, matrix, view);
+        object.transform(&context, matrix, view);
         
         context.clear();
 
         context.render(&cube);
         context.render(&cube2);
-        //context.render(&object);
+        context.render(&object);
 
         context.flush();
     }
