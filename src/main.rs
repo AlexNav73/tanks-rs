@@ -33,12 +33,12 @@ pub fn main() {
     let mut obj_x: f32 = 0.0;
     let mut obj_y: f32 = 0.0;
     while context.is_running() {
-        context.handle_event(|e| 
+        context.handle_event(|e, delta| 
             match e {
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => cam.move_forward(),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => cam.move_back(),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => cam.move_left(),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => cam.move_right(),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => cam.move_forward(delta),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => cam.move_back(delta),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => cam.move_left(delta),
+                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => cam.move_right(delta),
 
                 WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::I), _) => obj_x -= 1.0,
                 WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::K), _) => obj_x += 1.0,

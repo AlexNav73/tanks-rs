@@ -5,6 +5,8 @@ use cgmath;
 use gfx_device_gl;
 use gfx_window_glutin;
 
+use std::time::Instant;
+
 use gfx::{Device, Encoder};
 use gfx::traits::FactoryExt;
 use gfx_core::Factory;
@@ -29,7 +31,8 @@ pub struct Context {
     data: pipe::Data<gfx_device_gl::Resources>,
     encoder: gfx::Encoder<gfx_device_gl::Resources, gfx_device_gl::CommandBuffer>,
 
-    running: bool
+    running: bool,
+    time: Instant
 }
 
 impl Context {
@@ -64,7 +67,7 @@ impl Context {
             out_depth: main_depth
         };
 
-        Context { event_loop, window, device, pso, data, encoder, factory, projection, running: true }
+        Context { event_loop, window, device, pso, data, encoder, factory, projection, running: true, time: Instant::now() }
     }
 
     pub fn is_running(&self) -> bool {
@@ -72,17 +75,21 @@ impl Context {
     }
 
     pub fn handle_event<F>(&mut self, mut handler: F) 
-        where F: FnMut(WindowEvent)
+        where F: FnMut(WindowEvent, f32)
     {
         let mut events = Vec::new();
         self.event_loop.poll_events(|glutin::Event::WindowEvent { window_id: _, event }| events.push(event));
-        
+
+        let now = Instant::now();
+        let delta = now - self.time;
+        self.time = now;
+
         for e in events {
             match e {
                 WindowEvent::Resized(_w, _h) =>
                     gfx_window_glutin::update_views(&self.window, &mut self.data.out_color, &mut self.data.out_depth),
                 WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Escape), _) | WindowEvent::Closed => self.running = false,
-                _ => handler(e)
+                _ => handler(e, delta.subsec_nanos() as f32 / 1000_000_000.0)
             }
         }
     }

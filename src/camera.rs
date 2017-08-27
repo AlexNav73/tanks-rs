@@ -1,8 +1,6 @@
 
 use cgmath::{Point3, Vector3, Matrix4, EuclideanSpace, InnerSpace, Rad};
 
-const CAMERA_SPEED: f32 = 1.0;
-
 pub struct Camera {
     position: Vector3<f32>,
     front: Vector3<f32>,
@@ -54,19 +52,19 @@ impl Camera {
         self.front = direction.normalize();
     }
 
-    pub fn move_forward(&mut self) {
-        self.position += self.front * CAMERA_SPEED;
+    pub fn move_forward(&mut self, delta: f32) {
+        self.position += self.front * delta;
     }
 
-    pub fn move_back(&mut self) {
-        self.position -= self.front * CAMERA_SPEED;
+    pub fn move_back(&mut self, delta: f32) {
+        self.position -= self.front * delta;
     }
 
-    pub fn move_left(&mut self) {
-        self.position -= self.front.cross(self.up).normalize() * CAMERA_SPEED;
+    pub fn move_left(&mut self, delta: f32) {
+        self.position -= self.front.cross(self.up).normalize() * delta;
     }
 
-    pub fn move_right(&mut self) {
-        self.position += self.front.cross(self.up).normalize() * CAMERA_SPEED;
+    pub fn move_right(&mut self, delta: f32) {
+        self.position += self.front.cross(self.up).normalize() * delta;
     }
 }
