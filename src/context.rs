@@ -19,15 +19,17 @@ use mesh::{Object, Mesh};
 const CLEAR_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
 pub struct Context {
+    pub factory: gfx_device_gl::Factory,
+    pub projection: Matrix4<f32>,
+
     event_loop: glutin::EventsLoop,
     window: glutin::Window,
     device: gfx_device_gl::Device,
     pso: gfx::PipelineState<gfx_device_gl::Resources, pipe::Meta>,
     data: pipe::Data<gfx_device_gl::Resources>,
     encoder: gfx::Encoder<gfx_device_gl::Resources, gfx_device_gl::CommandBuffer>,
-    pub factory: gfx_device_gl::Factory,
-    running: bool,
-    pub projection: Matrix4<f32>,
+
+    running: bool
 }
 
 impl Context {
