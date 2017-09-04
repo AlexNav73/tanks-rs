@@ -52,7 +52,7 @@ pub fn main() {
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(WallSystem, "walls", &[])
-        .add(RenderSystem, "render", &["walls"])
+        .add_thread_local(RenderSystem)
         .build();
 
     let window_size = context.get_viewport_size().unwrap();
