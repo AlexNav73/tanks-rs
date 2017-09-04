@@ -52,6 +52,7 @@ pub fn main() {
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(WallSystem, "walls", &[])
+        .add(ModelSystem, "models", &[])
         .add_thread_local(RenderSystem)
         .build();
 

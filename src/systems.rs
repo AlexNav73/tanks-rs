@@ -12,14 +12,14 @@ use camera::Camera;
 use context::Command;
 
 pub struct WallSystem;
+pub struct ModelSystem;
 pub struct RenderSystem;
 
 impl<'a> System<'a> for WallSystem {
     type SystemData = (Fetch<'a, Camera>,
-                       WriteStorage<'a, Cube>,
-                       WriteStorage<'a, Model>);
+                       WriteStorage<'a, Cube>);
 
-    fn run(&mut self, (cam, mut walls, mut models): Self::SystemData) {
+    fn run(&mut self, (cam, mut walls): Self::SystemData) {
         use cgmath::{Matrix4, SquareMatrix};
         use specs::Join;
 
@@ -29,6 +29,20 @@ impl<'a> System<'a> for WallSystem {
         for wall in (&mut walls).join() {
             wall.transform(matrix, view);
         }
+    }
+}
+
+impl<'a> System<'a> for ModelSystem {
+    type SystemData = (Fetch<'a, Camera>,
+                       WriteStorage<'a, Model>);
+
+    fn run(&mut self, (cam, mut models): Self::SystemData) {
+        use cgmath::{Matrix4, SquareMatrix};
+        use specs::Join;
+
+        let view = cam.view();
+        let matrix = Matrix4::identity();
+
         for model in (&mut models).join() {
             model.transform(matrix, view);
         }
