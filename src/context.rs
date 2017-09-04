@@ -95,7 +95,7 @@ impl Context {
         self.encoder.clear_depth(&self.data.out_depth, 1.0);
     }
 
-    fn render(&mut self, model: &Arc<RwLock<Mesh>>) {
+    fn render(&mut self, model: Arc<RwLock<Mesh>>) {
         let mesh = model.read().unwrap();
         self.data.vbuf = mesh.vertices().clone();
         self.data.texture.0 = mesh.texture().view();
@@ -111,7 +111,7 @@ impl Context {
 
     pub fn handle(&mut self, cmd: Command) {
         match cmd {
-            Command::Render(ref mesh) => self.render(mesh)
+            Command::Render(mesh) => self.render(mesh)
         }
     }
 
