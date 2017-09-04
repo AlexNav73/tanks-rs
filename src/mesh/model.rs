@@ -1,19 +1,25 @@
 #![allow(dead_code)]
 
+use std::sync::Arc;
+use std::sync::RwLock;
+
 use std::path::Path;
 use std::fs::File;
 use std::io::BufReader;
 
 use obj::{self, load_obj};
 use cgmath::{Matrix4, SquareMatrix};
+use specs::VecStorage;
 
 use mesh::{Object, Mesh};
 use context::Context;
 use defines::Vertex;
 use camera::Camera;
 
+#[derive(Component)]
+#[component(VecStorage)]
 pub struct Model {
-    mesh: Mesh
+    mesh: Arc<RwLock<Mesh>>
 }
 
 impl Model {
@@ -27,14 +33,15 @@ impl Model {
 
         let texture = [0x20, 0xA0, 0xC0, 0x00];
         let position = Matrix4::identity().into();
+
+        let mesh = context.create_mesh(position, cam.view(), &texture, &vert, idxs.as_slice());
         Model {
-            mesh: context.create_mesh(position, cam.view(), &texture, &vert, idxs.as_slice())
+            mesh: Arc::new(RwLock::new(mesh))
         }
     }
 }
 
 impl Object for Model {
-    fn mesh(&self) -> &Mesh { &self.mesh }
-    fn mesh_mut(&mut self) -> &mut Mesh { &mut self.mesh }
+    fn mesh(&self) -> Arc<RwLock<Mesh>> { self.mesh.clone() }
 }
 

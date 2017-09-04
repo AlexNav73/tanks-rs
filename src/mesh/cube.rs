@@ -1,17 +1,23 @@
 
+use std::sync::Arc;
+use std::sync::RwLock;
+
 use genmesh;
 
 use genmesh::generators::{IndexedPolygon, SharedVertex};
 use genmesh::{Triangulate, Vertices};
 use cgmath::{Matrix4, SquareMatrix};
+use specs::VecStorage;
 
 use mesh::{Object, Mesh};
 use defines::Vertex;
 use context::Context;
 use camera::Camera;
 
+#[derive(Component)]
+#[component(VecStorage)]
 pub struct Cube {
-    mesh: Mesh
+    mesh: Arc<RwLock<Mesh>>
 }
 
 impl Cube {
@@ -29,14 +35,14 @@ impl Cube {
         let texels = [0x20, 0xA0, 0xC0, 0x00];
         let position = Matrix4::identity().into();
 
+        let mesh = context.create_mesh(position, cam.view(), &texels, &vertex_data, &index_data); 
         Cube {
-            mesh: context.create_mesh(position, cam.view(), &texels, &vertex_data, &index_data)
+            mesh: Arc::new(RwLock::new(mesh))
         }
     }
 }
 
 impl Object for Cube {
-    fn mesh(&self) -> &Mesh { &self.mesh }
-    fn mesh_mut(&mut self) -> &mut Mesh { &mut self.mesh }
+    fn mesh(&self) -> Arc<RwLock<Mesh>> { self.mesh.clone() }
 }
 

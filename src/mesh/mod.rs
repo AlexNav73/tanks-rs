@@ -1,4 +1,7 @@
 
+use std::sync::Arc;
+use std::sync::RwLock;
+
 use gfx;
 use gfx::traits::FactoryExt;
 use gfx_device_gl::Resources;
@@ -56,20 +59,17 @@ impl Mesh {
         &self.texture
     }
 
-    pub fn update(&mut self, ctx: &Context, new: Matrix4<f32>, cam: Matrix4<f32>) {
-        self.locals = Locals {
-            transform: new.into(),
-            view: cam.into(),
-            proj: ctx.projection.into()
-        }
+    pub fn update(&mut self, new: Matrix4<f32>, cam: Matrix4<f32>) {
+        self.locals.transform = new.into();
+        self.locals.view = cam.into();
     }
 }
 
 pub trait Object {
-    fn mesh(&self) -> &Mesh;
-    fn mesh_mut(&mut self) -> &mut Mesh;
+    fn mesh(&self) -> Arc<RwLock<Mesh>>;
 
-    fn transform(&mut self, ctx: &Context, new: Matrix4<f32>, cam: Matrix4<f32>) {
-        self.mesh_mut().update(ctx, new, cam);
+    fn transform(&mut self, new: Matrix4<f32>, cam: Matrix4<f32>) {
+        let mesh = self.mesh();
+        mesh.write().unwrap().update(new, cam);
     }
 }

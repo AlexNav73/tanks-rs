@@ -6,17 +6,19 @@ use gfx_device_gl;
 use gfx_window_glutin;
 
 use std::time::Instant;
+use std::sync::RwLock;
+use std::sync::Arc;
 
 use gfx::{Device, Encoder};
 use gfx::traits::FactoryExt;
 use gfx_core::Factory;
-use glutin::{WindowEvent, VirtualKeyCode};
+use glutin::WindowEvent;
 
 use cgmath::{Matrix4, Deg, SquareMatrix};
 
 use defines::{pipe, ColorFormat, DepthFormat, Vertex};
 use texture::Texture;
-use mesh::{Object, Mesh};
+use mesh::Mesh;
 
 const CLEAR_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
@@ -31,7 +33,6 @@ pub struct Context {
     data: pipe::Data<gfx_device_gl::Resources>,
     encoder: gfx::Encoder<gfx_device_gl::Resources, gfx_device_gl::CommandBuffer>,
 
-    running: bool,
     time: Instant
 }
 
@@ -67,11 +68,7 @@ impl Context {
             out_depth: main_depth
         };
 
-        Context { event_loop, window, device, pso, data, encoder, factory, projection, running: true, time: Instant::now() }
-    }
-
-    pub fn is_running(&self) -> bool {
-        self.running
+        Context { event_loop, window, device, pso, data, encoder, factory, projection, time: Instant::now() }
     }
 
     pub fn handle_event<F>(&mut self, mut handler: F) 
@@ -88,7 +85,6 @@ impl Context {
             match e {
                 WindowEvent::Resized(_w, _h) =>
                     gfx_window_glutin::update_views(&self.window, &mut self.data.out_color, &mut self.data.out_depth),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Escape), _) | WindowEvent::Closed => self.running = false,
                 _ => handler(e, delta.subsec_nanos() as f32 / 1000_000_000.0)
             }
         }
@@ -99,8 +95,8 @@ impl Context {
         self.encoder.clear_depth(&self.data.out_depth, 1.0);
     }
 
-    pub fn render<M: Object>(&mut self, model: &M) {
-        let mesh = model.mesh();
+    fn render(&mut self, model: &Arc<RwLock<Mesh>>) {
+        let mesh = model.read().unwrap();
         self.data.vbuf = mesh.vertices().clone();
         self.data.texture.0 = mesh.texture().view();
         self.encoder.update_constant_buffer(&self.data.locals, mesh.locals());
@@ -111,6 +107,12 @@ impl Context {
         self.encoder.flush(&mut self.device);
         self.window.swap_buffers().unwrap();
         self.device.cleanup();
+    }
+
+    pub fn handle(&mut self, cmd: Command) {
+        match cmd {
+            Command::Render(ref mesh) => self.render(mesh)
+        }
     }
 
     pub fn create_texture(&mut self, data: &[u8]) -> Texture {
@@ -136,4 +138,8 @@ fn build_window() -> glutin::WindowBuilder<'static> {
         .with_title("Tanks-rs".to_string())
         .with_dimensions(1024, 768)
         .with_vsync()
+}
+
+pub enum Command {
+    Render(Arc<RwLock<Mesh>>)
 }
