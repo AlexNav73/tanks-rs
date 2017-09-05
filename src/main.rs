@@ -25,13 +25,13 @@ mod context;
 mod texture;
 mod mesh;
 mod camera;
-mod components;
+mod systems;
 
 use camera::Camera;
 use context::Context;
 use mesh::cube::Cube;
 use mesh::model::Model;
-use components::*;
+use systems::*;
 
 pub fn main() {
     let mut context = Context::new();
