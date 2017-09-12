@@ -12,7 +12,6 @@ use specs::VecStorage;
 use mesh::{Object, Mesh};
 use defines::Vertex;
 use context::Context;
-use camera::Camera;
 
 #[derive(Component)]
 #[component(VecStorage)]
@@ -21,7 +20,7 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn new(context: &mut Context, cam: &Camera, offset: [f32; 3]) -> Self {
+    pub fn new(context: &mut Context, view: Matrix4<f32>, offset: [f32; 3]) -> Self {
         let cube = genmesh::generators::Cube::new();
         let vertex_data: Vec<Vertex> = cube.shared_vertex_iter()
             .map(|v| Vertex::new([v.pos[0] + offset[0], v.pos[1] + offset[1], v.pos[2] + offset[1]], [0, 0]))
@@ -35,7 +34,7 @@ impl Cube {
         let texels = [0x20, 0xA0, 0xC0, 0x00];
         let position = Matrix4::identity().into();
 
-        let mesh = context.create_mesh(position, cam.view(), &texels, &vertex_data, &index_data); 
+        let mesh = context.create_mesh(position, view, &texels, &vertex_data, &index_data); 
         Cube {
             mesh: Arc::new(RwLock::new(mesh))
         }

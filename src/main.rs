@@ -18,6 +18,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 use glutin::{WindowEvent, VirtualKeyCode};
+use cgmath::{Matrix4, SquareMatrix};
 use specs::{World, DispatcherBuilder};
 
 mod defines;
@@ -43,11 +44,11 @@ pub fn main() {
     world.register::<Model>();
     world.register::<Camera>();
 
-    let cam = Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0]);
-    world.create_entity().with(Cube::new(&mut context, &cam, [0.0, 0.0, 0.0])).build();
-    world.create_entity().with(Cube::new(&mut context, &cam, [3.0, 0.0, 0.0])).build();
-    world.create_entity().with(Model::new(&mut context, &cam, ".\\assets\\objs\\sphere.obj")).build();
-    world.create_entity().with(cam).build();
+    let view = Matrix4::identity();
+    world.create_entity().with(Cube::new(&mut context, view, [0.0, 0.0, 0.0])).build();
+    world.create_entity().with(Cube::new(&mut context, view, [3.0, 0.0, 0.0])).build();
+    world.create_entity().with(Model::new(&mut context, view, ".\\assets\\objs\\sphere.obj")).build();
+    world.create_entity().with(Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0])).build();
 
     world.add_resource(Arc::new(Mutex::new(ry)));
     world.add_resource(Arc::new(Mutex::new(tx)));
