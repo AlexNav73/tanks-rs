@@ -17,7 +17,6 @@ use std::sync::mpsc::channel;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use glutin::{WindowEvent, VirtualKeyCode};
 use cgmath::{Matrix4, SquareMatrix};
 use specs::{World, DispatcherBuilder};
 
@@ -45,10 +44,11 @@ pub fn main() {
     world.register::<Camera>();
 
     let view = Matrix4::identity();
+
+    world.create_entity().with(Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0])).build();
     world.create_entity().with(Cube::new(&mut context, view, [0.0, 0.0, 0.0])).build();
     world.create_entity().with(Cube::new(&mut context, view, [3.0, 0.0, 0.0])).build();
     world.create_entity().with(Model::new(&mut context, view, ".\\assets\\objs\\sphere.obj")).build();
-    world.create_entity().with(Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0])).build();
 
     world.add_resource(Arc::new(Mutex::new(ry)));
     world.add_resource(Arc::new(Mutex::new(tx)));
@@ -63,20 +63,22 @@ pub fn main() {
     let window_size = context.get_viewport_size().unwrap();
     let mut running = true;
     while running {
+        use glutin::{WindowEvent as Event, VirtualKeyCode as VK};
+
         context.handle_event(|e, delta| {
             match e {
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::W), _) => ty.send(Command::Forward(delta)).unwrap(),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::S), _) => ty.send(Command::Backward(delta)).unwrap(),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::A), _) => ty.send(Command::Left(delta)).unwrap(),
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::D), _) => ty.send(Command::Right(delta)).unwrap(),
+                Event::KeyboardInput(_, _, Some(VK::W), _) => ty.send(Command::Forward(delta)).unwrap(),
+                Event::KeyboardInput(_, _, Some(VK::S), _) => ty.send(Command::Backward(delta)).unwrap(),
+                Event::KeyboardInput(_, _, Some(VK::A), _) => ty.send(Command::Left(delta)).unwrap(),
+                Event::KeyboardInput(_, _, Some(VK::D), _) => ty.send(Command::Right(delta)).unwrap(),
 
-                WindowEvent::MouseMoved(mouse_y, mouse_x) => {
+                Event::MouseMoved(mouse_y, mouse_x) => {
                     let x = ((window_size.0 as f32 / 2.0) - mouse_x as f32) / 100.0;
                     let y = ((window_size.1 as f32 / 2.0) - mouse_y as f32) / 100.0;
 
                     ty.send(Command::Rotate(x, y)).unwrap();
                 },
-                WindowEvent::KeyboardInput(_, _, Some(VirtualKeyCode::Escape), _) | WindowEvent::Closed => running = false,
+                Event::KeyboardInput(_, _, Some(VK::Escape), _) | Event::Closed => running = false,
                 _ => {}
             }
         });
