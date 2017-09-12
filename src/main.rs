@@ -79,6 +79,10 @@ pub fn main() {
 
                     ty.send(Command::Rotate(x, y)).unwrap();
                 },
+                
+                Event::KeyboardInput(_, _, Some(VK::E), _) => {
+                    world.create_entity().with(Cube::new(&mut context, view, [4.0, 0.0, 0.0])).build();
+                },
                 Event::KeyboardInput(_, _, Some(VK::Escape), _) | Event::Closed => running = false,
                 Event::Resized(_w, _h) => context.update_views(),
                 _ => {}
