@@ -65,7 +65,8 @@ pub fn main() {
     while running {
         use glutin::{WindowEvent as Event, VirtualKeyCode as VK};
 
-        context.handle_event(|e, delta| {
+        let (events, delta) = context.events();
+        for e in events {
             match e {
                 Event::KeyboardInput(_, _, Some(VK::W), _) => ty.send(Command::Forward(delta)).unwrap(),
                 Event::KeyboardInput(_, _, Some(VK::S), _) => ty.send(Command::Backward(delta)).unwrap(),
@@ -79,9 +80,10 @@ pub fn main() {
                     ty.send(Command::Rotate(x, y)).unwrap();
                 },
                 Event::KeyboardInput(_, _, Some(VK::Escape), _) | Event::Closed => running = false,
+                Event::Resized(_w, _h) => context.update_views(),
                 _ => {}
             }
-        });
+        }
 
         context.clear();
 

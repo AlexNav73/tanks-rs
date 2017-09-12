@@ -71,9 +71,7 @@ impl Context {
         Context { event_loop, window, device, pso, data, encoder, factory, projection, time: Instant::now() }
     }
 
-    pub fn handle_event<F>(&mut self, mut handler: F) 
-        where F: FnMut(WindowEvent, f32)
-    {
+    pub fn events(&mut self) -> (Vec<WindowEvent>, f32) {
         let mut events = Vec::new();
         self.event_loop.poll_events(|glutin::Event::WindowEvent { window_id: _, event }| events.push(event));
 
@@ -81,13 +79,7 @@ impl Context {
         let delta = now - self.time;
         self.time = now;
 
-        for e in events {
-            match e {
-                WindowEvent::Resized(_w, _h) =>
-                    gfx_window_glutin::update_views(&self.window, &mut self.data.out_color, &mut self.data.out_depth),
-                _ => handler(e, delta.subsec_nanos() as f32 / 1000_000_000.0)
-            }
-        }
+        (events, delta.subsec_nanos() as f32 / 1000_000_000.0)
     }
 
     pub fn clear(&mut self) {
@@ -118,6 +110,10 @@ impl Context {
 
     pub fn get_viewport_size(&self) -> Option<(u32, u32)> {
         self.window.get_inner_size_pixels()
+    }
+
+    pub fn update_views(&mut self) {
+        gfx_window_glutin::update_views(&self.window, &mut self.data.out_color, &mut self.data.out_depth);
     }
 }
 
