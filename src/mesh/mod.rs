@@ -39,7 +39,7 @@ impl Mesh {
                 view: view.into(),
                 proj: context.projection.into()
             },
-            texture: context.create_texture(texture)
+            texture: Texture::from_raw(&mut context.factory, texture)
         }
     }
 

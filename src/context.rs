@@ -16,7 +16,7 @@ use glutin::WindowEvent;
 
 use cgmath::{Matrix4, Deg, SquareMatrix};
 
-use defines::{pipe, ColorFormat, DepthFormat, Vertex};
+use defines::{pipe, ColorFormat, DepthFormat};
 use texture::Texture;
 use mesh::Mesh;
 
@@ -114,19 +114,6 @@ impl Context {
             Command::Render(mesh) => self.render(mesh),
             _ => {}
         }
-    }
-
-    pub fn create_texture(&mut self, data: &[u8]) -> Texture {
-        Texture::from_raw(&mut self.factory, data)
-    }
-
-    pub fn create_mesh(&mut self,
-                       position: Matrix4<f32>,
-                       cam: Matrix4<f32>,
-                       texture: &[u8],
-                       vertices: &[Vertex],
-                       indexes: &[u32]) -> Mesh {
-        Mesh::new(self, position, cam, texture, vertices, indexes)
     }
 
     pub fn get_viewport_size(&self) -> Option<(u32, u32)> {

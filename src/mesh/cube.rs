@@ -34,7 +34,7 @@ impl Cube {
         let texels = [0x20, 0xA0, 0xC0, 0x00];
         let position = Matrix4::identity().into();
 
-        let mesh = context.create_mesh(position, view, &texels, &vertex_data, &index_data); 
+        let mesh = Mesh::new(context, position, view, &texels, &vertex_data, &index_data);
         Cube {
             mesh: Arc::new(RwLock::new(mesh))
         }

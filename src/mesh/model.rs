@@ -33,7 +33,7 @@ impl Model {
         let texture = [0x20, 0xA0, 0xC0, 0x00];
         let position = Matrix4::identity().into();
 
-        let mesh = context.create_mesh(position, view, &texture, &vert, idxs.as_slice());
+        let mesh = Mesh::new(context, position, view, &texture, &vert, idxs.as_slice());
         Model {
             mesh: Arc::new(RwLock::new(mesh))
         }
