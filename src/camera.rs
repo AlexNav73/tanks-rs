@@ -1,6 +1,9 @@
 
+use specs::VecStorage;
 use cgmath::{Point3, Vector3, Matrix4, EuclideanSpace, InnerSpace, Rad};
 
+#[derive(Component)]
+#[component(VecStorage)]
 pub struct Camera {
     position: Vector3<f32>,
     front: Vector3<f32>,

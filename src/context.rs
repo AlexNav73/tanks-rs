@@ -111,7 +111,8 @@ impl Context {
 
     pub fn handle(&mut self, cmd: Command) {
         match cmd {
-            Command::Render(mesh) => self.render(mesh)
+            Command::Render(mesh) => self.render(mesh),
+            _ => {}
         }
     }
 
@@ -141,5 +142,10 @@ fn build_window() -> glutin::WindowBuilder<'static> {
 }
 
 pub enum Command {
-    Render(Arc<RwLock<Mesh>>)
+    Render(Arc<RwLock<Mesh>>),
+    Left(f32),
+    Right(f32),
+    Forward(f32),
+    Backward(f32),
+    Rotate(f32, f32)
 }
