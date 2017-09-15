@@ -17,7 +17,6 @@ use std::sync::mpsc::channel;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use cgmath::{Matrix4, SquareMatrix};
 use specs::{World, DispatcherBuilder};
 
 mod defines;
@@ -47,20 +46,18 @@ pub fn main() {
     world.register::<Position>();
     world.register::<Velocity>();
 
-    let view = Matrix4::identity();
-
     world.create_entity().with(Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0])).build();
     world.create_entity()
-        .with(Cube::new(&mut context, view))
+        .with(Cube::new(&mut context))
         .with(Position::new(0.0, 0.0, 0.0))
         .with(Velocity::new(0.001, 0.0, 0.0))
         .build();
     world.create_entity()
-        .with(Cube::new(&mut context, view))
+        .with(Cube::new(&mut context))
         .with(Position::new(0.0, 0.0, 0.0))
         .build();
     world.create_entity()
-        .with(Model::new(&mut context, view, ".\\assets\\objs\\sphere.obj"))
+        .with(Model::new(&mut context, ".\\assets\\objs\\sphere.obj"))
         .with(Position::new(0.0, 0.0, 0.0))
         .build();
 
@@ -96,7 +93,7 @@ pub fn main() {
                 },
                 
                 Event::KeyboardInput(_, _, Some(VK::E), _) => {
-                    world.create_entity().with(Cube::new(&mut context, view)).build();
+                    world.create_entity().with(Cube::new(&mut context)).build();
                 },
                 Event::KeyboardInput(_, _, Some(VK::Escape), _) | Event::Closed => running = false,
                 Event::Resized(_w, _h) => context.update_views(),

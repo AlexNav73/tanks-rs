@@ -7,7 +7,7 @@ use gfx::traits::FactoryExt;
 use gfx_device_gl::Resources;
 use gfx_core::handle::Buffer;
 
-use cgmath::Matrix4;
+use cgmath::{Matrix4, SquareMatrix};
 
 use texture::Texture;
 use defines::{Vertex, Locals};
@@ -25,11 +25,12 @@ pub struct Mesh {
 
 impl Mesh {
     pub fn new(context: &mut Context,
-               matrix: Matrix4<f32>,
-               view: Matrix4<f32>,
                texture: &[u8],
                vertex_data: &[Vertex],
                index_data: &[u32]) -> Self {
+
+        let matrix = Matrix4::identity();
+        let view = Matrix4::identity();
         let (vertex_buffer, slice) = context.factory.create_vertex_buffer_with_slice(vertex_data, index_data);
         Mesh {
             vertices: vertex_buffer,

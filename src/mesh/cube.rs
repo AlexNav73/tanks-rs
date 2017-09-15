@@ -6,7 +6,6 @@ use genmesh;
 
 use genmesh::generators::{IndexedPolygon, SharedVertex};
 use genmesh::{Triangulate, Vertices};
-use cgmath::{Matrix4, SquareMatrix};
 use specs::VecStorage;
 
 use mesh::{Object, Mesh};
@@ -20,7 +19,7 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn new(context: &mut Context, view: Matrix4<f32>) -> Self {
+    pub fn new(context: &mut Context) -> Self {
         let cube = genmesh::generators::Cube::new();
         let vertex_data: Vec<Vertex> = cube.shared_vertex_iter()
             .map(|v| Vertex::new([v.pos[0], v.pos[1], v.pos[2]], [0, 0]))
@@ -32,9 +31,8 @@ impl Cube {
             .collect();
 
         let texels = [0x20, 0xA0, 0xC0, 0x00];
-        let position = Matrix4::identity().into();
 
-        let mesh = Mesh::new(context, position, view, &texels, &vertex_data, &index_data);
+        let mesh = Mesh::new(context, &texels, &vertex_data, &index_data);
         Cube {
             mesh: Arc::new(RwLock::new(mesh))
         }
