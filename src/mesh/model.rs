@@ -22,7 +22,7 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn new<P: AsRef<Path>>(context: &mut Context, view: Matrix4<f32>, path: P) -> Self {
+    pub fn new<P: AsRef<Path>>(context: &mut Context, position: Matrix4<f32>, path: P) -> Self {
         let file = BufReader::new(File::open(path).unwrap());
         let obj_data = load_obj(file).unwrap();
         let idxs = obj_data.indices.iter().map(|&i| i as u32).collect::<Vec<_>>();
@@ -31,7 +31,7 @@ impl Model {
             .collect::<Vec<Vertex>>();
 
         let texture = [0x20, 0xA0, 0xC0, 0x00];
-        let position = Matrix4::identity().into();
+        let view = Matrix4::identity().into();
 
         let mesh = Mesh::new(context, position, view, &texture, &vert, idxs.as_slice());
         Model {

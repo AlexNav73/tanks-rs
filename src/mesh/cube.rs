@@ -20,10 +20,10 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn new(context: &mut Context, view: Matrix4<f32>, offset: [f32; 3]) -> Self {
+    pub fn new(context: &mut Context, view: Matrix4<f32>) -> Self {
         let cube = genmesh::generators::Cube::new();
         let vertex_data: Vec<Vertex> = cube.shared_vertex_iter()
-            .map(|v| Vertex::new([v.pos[0] + offset[0], v.pos[1] + offset[1], v.pos[2] + offset[1]], [0, 0]))
+            .map(|v| Vertex::new([v.pos[0], v.pos[1], v.pos[2]], [0, 0]))
             .collect();
         let index_data: Vec<u32> = cube.indexed_polygon_iter()
             .triangulate()

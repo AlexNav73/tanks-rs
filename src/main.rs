@@ -26,11 +26,13 @@ mod texture;
 mod mesh;
 mod camera;
 mod systems;
+mod components;
 
 use camera::Camera;
 use context::{Context, Command};
 use mesh::cube::Cube;
 use mesh::model::Model;
+use components::*;
 use systems::*;
 
 pub fn main() {
@@ -42,21 +44,34 @@ pub fn main() {
     world.register::<Cube>();
     world.register::<Model>();
     world.register::<Camera>();
+    world.register::<Position>();
+    world.register::<Velocity>();
 
     let view = Matrix4::identity();
 
     world.create_entity().with(Camera::new([1.0f32, 0.0, 2.0], [0.0, 0.0, -1.0])).build();
-    world.create_entity().with(Cube::new(&mut context, view, [0.0, 0.0, 0.0])).build();
-    world.create_entity().with(Cube::new(&mut context, view, [3.0, 0.0, 0.0])).build();
-    world.create_entity().with(Model::new(&mut context, view, ".\\assets\\objs\\sphere.obj")).build();
+    world.create_entity()
+        .with(Cube::new(&mut context, view))
+        .with(Position::new(0.0, 0.0, 0.0))
+        .with(Velocity::new(0.001, 0.0, 0.0))
+        .build();
+    world.create_entity()
+        .with(Cube::new(&mut context, view))
+        .with(Position::new(0.0, 0.0, 0.0))
+        .build();
+    world.create_entity()
+        .with(Model::new(&mut context, view, ".\\assets\\objs\\sphere.obj"))
+        .with(Position::new(0.0, 0.0, 0.0))
+        .build();
 
     world.add_resource(Arc::new(Mutex::new(ry)));
     world.add_resource(Arc::new(Mutex::new(tx)));
 
     let mut dispatcher = DispatcherBuilder::new()
-        .add(WallSystem, "walls", &[])
-        .add(ModelSystem, "models", &[])
-        .add(CameraSystem, "camera", &[])
+        .add(MovementSystem, "move", &[])
+        .add(WallSystem, "walls", &["move"])
+        .add(ModelSystem, "models", &["move"])
+        .add(CameraSystem, "camera", &["move"])
         .add_thread_local(RenderSystem)
         .build();
 
@@ -81,7 +96,7 @@ pub fn main() {
                 },
                 
                 Event::KeyboardInput(_, _, Some(VK::E), _) => {
-                    world.create_entity().with(Cube::new(&mut context, view, [4.0, 0.0, 0.0])).build();
+                    world.create_entity().with(Cube::new(&mut context, view)).build();
                 },
                 Event::KeyboardInput(_, _, Some(VK::Escape), _) | Event::Closed => running = false,
                 Event::Resized(_w, _h) => context.update_views(),

@@ -68,8 +68,8 @@ impl Mesh {
 pub trait Object {
     fn mesh(&self) -> Arc<RwLock<Mesh>>;
 
-    fn transform(&mut self, new: Matrix4<f32>, cam: Matrix4<f32>) {
+    fn transform(&mut self, pos: Matrix4<f32>, view: Matrix4<f32>) {
         let mesh = self.mesh();
-        mesh.write().unwrap().update(new, cam);
+        mesh.write().unwrap().update(pos, view);
     }
 }

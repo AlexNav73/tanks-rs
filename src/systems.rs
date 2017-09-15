@@ -10,6 +10,7 @@ use mesh::cube::Cube;
 use mesh::model::Model;
 use camera::Camera;
 use context::Command;
+use components::*;
 
 pub struct WallSystem;
 pub struct ModelSystem;
@@ -18,34 +19,34 @@ pub struct RenderSystem;
 
 impl<'a> System<'a> for WallSystem {
     type SystemData = (ReadStorage<'a, Camera>,
+                       ReadStorage<'a, Position>,
                        WriteStorage<'a, Cube>);
 
-    fn run(&mut self, (cam, mut walls): Self::SystemData) {
-        use cgmath::{Matrix4, SquareMatrix};
+    fn run(&mut self, (cam, poss, mut walls): Self::SystemData) {
+        use cgmath::Matrix4;
         use specs::Join;
 
         let view = (&cam).join().next().unwrap().view();
-        let matrix = Matrix4::identity();
 
-        for wall in (&mut walls).join() {
-            wall.transform(matrix, view);
+        for (wall, p) in (&mut walls, &poss).join() {
+            wall.transform(Matrix4::from_translation(p.into_vec()), view);
         }
     }
 }
 
 impl<'a> System<'a> for ModelSystem {
     type SystemData = (ReadStorage<'a, Camera>,
+                       ReadStorage<'a, Position>,
                        WriteStorage<'a, Model>);
 
-    fn run(&mut self, (cam, mut models): Self::SystemData) {
-        use cgmath::{Matrix4, SquareMatrix};
+    fn run(&mut self, (cam, poss, mut models): Self::SystemData) {
+        use cgmath::Matrix4;
         use specs::Join;
 
         let view = (&cam).join().next().unwrap().view();
-        let matrix = Matrix4::identity();
 
-        for model in (&mut models).join() {
-            model.transform(matrix, view);
+        for (model, p) in (&mut models, &poss).join() {
+            model.transform(Matrix4::from_translation(p.into_vec()), view);
         }
     }
 }
@@ -87,6 +88,20 @@ impl<'a> System<'a> for RenderSystem {
         }
         for model in models.join() {
             channel.send(Command::Render(model.mesh().clone())).unwrap();
+        }
+    }
+}
+
+pub struct MovementSystem;
+impl<'a> System<'a> for MovementSystem {
+    type SystemData = (WriteStorage<'a, Position>,
+                       ReadStorage<'a, Velocity>);
+
+    fn run(&mut self, (mut poss, vel): Self::SystemData) {
+        use specs::Join;
+
+        for (p, v) in (&mut poss, &vel).join() {
+            p.x += v.x; p.y += v.y; p.z += v.z;
         }
     }
 }
